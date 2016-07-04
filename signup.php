@@ -83,7 +83,8 @@ $fhName = "文昌帝君供养法会"
                 <label>
                     斋主姓名
                 </label>
-                <input type="text" name="host_name" id="host_name" placeholder="请输入斋主姓名..." onfocus="fillUserInfo('host')">
+                <input type="text" name="host_name" id="host_name" placeholder="请输入斋主姓名..."
+                       onfocus="fillUserInfo('host')">
             </div>
             <div class="ui-form-item ui-border-b">
                 <label>
@@ -145,7 +146,7 @@ $fhName = "文昌帝君供养法会"
                 <input type="text" id="user_info_name" placeholder="请输入姓名...">
             </div>
             <div class="ui-form-item ui-border-b">
-                <label>公历生日</label>
+                <label>出生年月</label>
                 <div class="ui-select-group">
                     <div class="ui-select">
                         <select id="birth_year" onchange="generateDay()">
@@ -177,10 +178,13 @@ $fhName = "文昌帝君供养法会"
                             <option id="bm_12">12</option>
                         </select>
                     </div>
-                    <div class="ui-select">
-                        <select id="birth_day" onchange="generateLunarCalendar()">
-                        </select>
-                    </div>
+                </div>
+            </div>
+            <div class="ui-form-item ui-border-b">
+                <label>出生日期</label>
+                <div class="ui-select">
+                    <select id="birth_day" onchange="generateLunarCalendar()">
+                    </select>
                 </div>
             </div>
             <div class="ui-form-item ui-border-b">
@@ -242,7 +246,7 @@ $fhName = "文昌帝君供养法会"
         var month = parseInt($("#birth_month option").eq($("#birth_month").attr("selectedIndex")).text());
         var day = parseInt($("#birth_day option").eq($("#birth_day").attr("selectedIndex")).text());
         var lunar = calendar.solar2lunar(year, month, day);
-        $('#lunar_text').val(lunar.gzYear + '年' + lunar.IMonthCn + lunar.IDayCn );
+        $('#lunar_text').val(lunar.gzYear + '年' + lunar.IMonthCn + lunar.IDayCn);
         $('#shengxiao').val(lunar.Animal)
     }
 
@@ -266,15 +270,17 @@ $fhName = "文昌帝君供养法会"
 
         var nameId, birthId;
 
-        if (type == "host" ) {
+        if (type == "host") {
             nameId = type + "_name";
             birthId = type + "_birth";
             $("#user_title").html("斋主姓名");
             $("#dialog_title").html("填写斋主信息");
-            $("#confirm_button").click(function(){addUserInfo('host');});
-        }else if( type == "member" ){
+            $("#confirm_button").click(function () {
+                addUserInfo('host');
+            });
+        } else if (type == "member") {
 
-            if( memberCount > 4 ){
+            if (memberCount > 4) {
                 alert("最多只能添加 4 位家庭成员!");
                 return;
             }
@@ -285,7 +291,9 @@ $fhName = "文昌帝君供养法会"
             birthId = type + "_" + memberCount + "_birth";
             $("#user_title").html("成员姓名");
             $("#dialog_title").html("填写家庭成员信息");
-            $("#confirm_button").click(function(){addUserInfo('member_'+memberCount);});
+            $("#confirm_button").click(function () {
+                addUserInfo('member_' + memberCount);
+            });
         }
 
         $("#user_info").addClass("show");
@@ -296,17 +304,17 @@ $fhName = "文昌帝君供养法会"
         $("#user_info").removeClass("show");
     }
 
-    function addUserInfo( type ) {
+    function addUserInfo(type) {
 
         var name = $("#user_info_name").val();
         var birthday = $("#lunar_text").val() + " (" + $("#shengxiao").val() + ")";
 
-        if( type == 'host'){
+        if (type == 'host') {
             $("#host_name").val(name);
             $("#host_birthday").val(birthday);
-        }else{
+        } else {
 
-            if( memberCount > 4 ){
+            if (memberCount > 4) {
                 alert("最多只能添加 4 位家庭成员!");
                 return;
             }
@@ -315,18 +323,20 @@ $fhName = "文昌帝君供养法会"
             var removeId = "member_remove_" + memberDivCount;
             memberDom = $("#family_member");
             memberDom.append(
-                "<li class='ui-form-item ui-border-b' id='"+divId+"'>"+
-                    "<label>家庭成员</label>" +
-                    "<input type='text' value='"+ name + " " + birthday + "' disabled>" +
-                    "<a id='"+ removeId +"' class='ui-icon-close'></a>" +
+                "<li class='ui-form-item ui-border-b' id='" + divId + "'>" +
+                "<label>家庭成员</label>" +
+                "<input type='text' value='" + name + " " + birthday + "' disabled>" +
+                "<a id='" + removeId + "' class='ui-icon-close'></a>" +
                 "</li>"
             );
-            $("#"+removeId).click(function(){removeMember(divId);});
+            $("#" + removeId).click(function () {
+                removeMember(divId);
+            });
 
             memberCount++;
             memberDivCount++;
 
-            if( memberCount > 4 ){
+            if (memberCount > 4) {
                 $("#add_member_div").hide();
             }
         }
@@ -335,10 +345,9 @@ $fhName = "文昌帝君供养法会"
 
     }
 
-    function removeMember( id ){
-        alert(id);
-        $("#"+id).remove();
-        if( memberCount > 4 ){
+    function removeMember(id) {
+        $("#" + id).remove();
+        if (memberCount > 4) {
             $("#add_member_div").show();
         }
         memberCount--;
