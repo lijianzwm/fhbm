@@ -66,8 +66,8 @@ $fhName = "文昌帝君供养法会"
                 </label>
                 <div class="ui-select">
                     <select id="sx_item" onchange="autoFill()">
-                        <option value="300">小斋主</option>
-                        <option value="2000">大斋主</option>
+                        <option value="300">小斋-300</option>
+                        <option value="2000">大斋2000</option>
                         <option value="any">随喜不限</option>
                     </select>
                 </div>
@@ -311,8 +311,8 @@ $fhName = "文昌帝君供养法会"
                 return;
             }
 
-            divId = "member_div_" + memberDivCount;
-            removeId = "member_remove_" + memberDivCount;
+            var divId = "member_div_" + memberDivCount;
+            var removeId = "member_remove_" + memberDivCount;
             memberDom = $("#family_member");
             memberDom.append(
                 "<li class='ui-form-item ui-border-b' id='"+divId+"'>"+
@@ -336,6 +336,7 @@ $fhName = "文昌帝君供养法会"
     }
 
     function removeMember( id ){
+        alert(id);
         $("#"+id).remove();
         if( memberCount > 4 ){
             $("#add_member_div").show();
