@@ -6,30 +6,6 @@
  * Time: 下午1:56
  */
 
-/**
- * fh_fahui
- * id,
- * name,
- * starttime,
- * description
- *
- * fh_offer_type
- * id
- * name
- * money
- *
- * fh_order
- * id
- * type
- * money
- * host
- * member
- * huixiang
- * address
- *
- *
- */
-
 require_once "./conf/db.php";
 require_once "./pay/wxpay/WxPayService.php";
 
@@ -108,22 +84,22 @@ $openid = $userinfo['openid'];
             </div>
             <div class="ui-form-item ui-border-b">
                 <label>
-                    法会选项
+                    随喜项目
                 </label>
                 <div class="ui-select">
                     <select id="sx_item" name="sx_item" onchange="autoFill()">
-                        <option value="300">小斋-300</option>
-                        <option value="2000">大斋2000</option>
                         <option value="any">随喜不限</option>
+                        <option value="300">小斋-300元</option>
+                        <option value="2000">大斋-2000元</option>
                     </select>
                 </div>
-                <input type="hidden" name="sx_item_name" id="sx_item_name" value="小斋300"/>
+                <input type="hidden" name="sx_item_name" id="sx_item_name" value="随喜不限"/>
             </div>
-            <div class="ui-form-item ui-border-b">
+            <div class="ui-form-item ui-border-b" id="money_div">
                 <label>
                     随喜金额
                 </label>
-                <input type="text" name="money" id="money" placeholder="请输入随喜金额..." disabled value="300">
+                <input type="text" name="money" id="money" placeholder="请输入随喜金额..." />
             </div>
             <div class="ui-form-item ui-border-b">
                 <label>
@@ -144,10 +120,10 @@ $openid = $userinfo['openid'];
                 </label>
                 <input name="phone" id="phone" type="text" placeholder="请输入手机号码...">
             </div>
-            <ul id="family_member">
+            <li id="family_member">
 
-            </ul>
-            <input id="family_member_str" name="members" value=""/>
+            </li>
+            <input type="hidden" id="family_member_str" name="members" value=""/>
 
             <div class="ui-form-item ui-form-item-textarea ui-border-b" id="add_member_div">
                 <label>
@@ -300,12 +276,10 @@ $openid = $userinfo['openid'];
         var money = $("#sx_item option").eq($("#sx_item").attr("selectedIndex")).val();
         $("#sx_item_name").val($("#sx_item option").eq($("#sx_item").attr("selectedIndex")).text());
         if (money == "any") {
-            $("#money").removeAttr("disabled");
+            $("#money_div").show();
             $("#money").val("");
-        } else {
-            $("#money").removeAttr("disabled");
-            $("#money").attr("disabled", "disabled");
-            $("#money").val(money);
+        }else{
+            $("#money_div").hide();
         }
     }
 
@@ -400,7 +374,7 @@ $openid = $userinfo['openid'];
     }
 
     function submitForm() {
-
+        $("#money").removeAttr("disabled");
         //随喜金额
         var money = $("#money").val();
         if ( money == "") {

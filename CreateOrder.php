@@ -10,6 +10,7 @@ require_once "./conf/db.php";
 
 date_default_timezone_set("Asia/Shanghai");
 
+$fh_id = $_POST['fh_id'];
 $order_no = $_POST['order_no'];
 $type = $_POST['type'];
 $pay_status = 'NONE';
@@ -17,6 +18,7 @@ $pay_channel = $_POST['pay_channel'];
 $money = $_POST['money'];
 $host_name = $_POST['host_name'];
 $host_birthday = $_POST['host_birthday'];
+$phone = $_POST['phone'];
 $member = $_POST['member'];
 $address = $_POST['address'];
 $huixiang = $_POST['huixiang'];
@@ -24,6 +26,7 @@ $create_time = date("Y-m-d H:i:s" , time());
 
 
 $sql = "INSERT INTO {$dbprefix}order(
+            fh_id,
             order_no,
             type,
             pay_status,
@@ -31,6 +34,7 @@ $sql = "INSERT INTO {$dbprefix}order(
             money,
             host_name,
             host_birthday,
+            phone,
             member,
             address,
             huixiang,
@@ -38,6 +42,7 @@ $sql = "INSERT INTO {$dbprefix}order(
         )
         VALUES
             (
+                '{$fh_id}',
                 '{$order_no}',
                 '{$type}',
                 '{$pay_status}',
@@ -45,6 +50,7 @@ $sql = "INSERT INTO {$dbprefix}order(
                 '{$money}',
                 '{$host_name}',
                 '{$host_birthday}',
+                '{$phone}',
                 '{$member}',
                 '{$address}',
                 '{$huixiang}',

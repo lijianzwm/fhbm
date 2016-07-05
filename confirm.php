@@ -19,11 +19,11 @@ if( !isset($_POST['openid'] ) ){
 $openid = $_POST['openid'];
 $fhId = $_POST['fh_id'];
 $fhName = $_POST['fh_name'];
-$sxItem = $_POST['sx_item_name'];
+$sxItem = $_POST['sx_item'];
 if ($sxItem == "any") {
-    $money = $_POST['money'];
+    $money = intval($_POST['money']);
 } else {
-    $money = $_POST['sx_item'];
+    $money = intval($_POST['sx_item']);
 }
 $hostName = $_POST['host_name'];
 $hostBirth = $_POST['host_birthday'];
@@ -37,7 +37,7 @@ $memberArr = array();
 if ($members != "") {
     $memberArr = explode('; ', $members);
 }
-
+$order_no = time().mt_rand(10,100);
 
 //生成订单信息
 $notifyUrl = "http://" . $_SERVER['HTTP_HOST'] . "/fhbm/pay/wxpay/notify.php";
@@ -54,17 +54,18 @@ $input->SetTime_expire(date("YmdHis", time() + 600));
 $input->SetNotify_url($notifyUrl);
 $input->SetTrade_type("JSAPI");
 $input->SetOpenid($openid);
+
 $order = WxPayApi::unifiedOrder($input);
 
 if( !isset($order) ){
     die("订单生成失败!");
 }
 
+
 if(!array_key_exists("appid", $order) || !array_key_exists("prepay_id", $order) || $order['prepay_id'] == ""){
     echo "<script>alert('参数错误,点击重新下单!'); window.location.href='m_yishan.php';</script>";
 }
-
-
+$jsApiParameters = $tools->GetJsApiParameters($order);
 ?>
 
 
@@ -127,7 +128,7 @@ if(!array_key_exists("appid", $order) || !array_key_exists("prepay_id", $order) 
     </table>
     <br/>
     <div class="ui-btn-wrap">
-        <button class="ui-btn-lg ui-btn-primary" onclick="createOrder()">
+        <button class="ui-btn-lg ui-btn-primary" id="wxpay_button" onclick="createOrder()">
             微信支付
         </button>
         <br/ >
@@ -169,9 +170,6 @@ if(!array_key_exists("appid", $order) || !array_key_exists("prepay_id", $order) 
 <script src="./lib/zepto.min.js"></script>
 <script>
 
-    var randNum =  Math.ceil(Math.random()*89)+10;
-    order_no = (new Date()).valueOf() + "" + randNum;
-
     function refill(){
         window.location.href="signup.php";
     }
@@ -182,12 +180,14 @@ if(!array_key_exists("appid", $order) || !array_key_exists("prepay_id", $order) 
         $.ajax({
             url: "CreateOrder.php",
             data: {
-                order_no : order_no,
+                fh_id : <?php echo $fhId; ?>,
+                order_no : <?php echo $order_no; ?>,
                 type : '<?php echo $sxItem=="any"?"随喜不限":$sxItem; ?>',
                 money : '<?php echo $money; ?>',
                 pay_channel : '<?php echo $payChannel; ?>',
                 host_name : '<?php echo $hostName; ?>',
                 host_birthday : '<?php echo $hostBirth; ?>',
+                phone : '<?php echo $phone; ?>',
                 member : '<?php echo $members; ?>',
                 address : '<?php echo $address; ?>',
                 huixiang : '<?php echo $huixiang; ?>'
@@ -218,6 +218,32 @@ if(!array_key_exists("appid", $order) || !array_key_exists("prepay_id", $order) 
         $(".ui-dialog").removeClass("show");
     }
 
+    function updatePayStatus(){
+        $.ajax({
+            url: "./pay/wxpay/UpdatePayStatus.php",
+            data: {
+                out_trade_no : '<?php echo $order_no; ?>'
+            },
+            type: 'post',
+            cache: false,
+            dataType: 'json',
+            success: function (data) {
+                if (data.error_code) {
+                    alert(data.msg+"点击重试!");
+                    updatePayStatus();
+                }else{
+                    $("#now_loading").removeClass("show");
+                    alert(data.msg);
+                    window.location.href="success.php";
+                }
+            },
+            error: function () {
+                alert("更新订单状态请求失败,点击重试!");
+                updatePayStatus();
+            }
+        });
+    }
+
     //调用微信JS api 支付
     function jsApiCall(){
         WeixinJSBridge.invoke(
@@ -225,7 +251,9 @@ if(!array_key_exists("appid", $order) || !array_key_exists("prepay_id", $order) 
             <?php echo $jsApiParameters; ?>,
             function(res){
                 if( !res.err_code ){
-                    queryOrder();
+                    $("#now_loading").addClass("show");
+                    $("#loading_text").text("处理中...");
+                    updatePayStatus();
                 }else{
                     alert(res.err_code+res.err_desc+res.err_msg);
                 }
