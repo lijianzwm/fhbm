@@ -12,6 +12,11 @@ date_default_timezone_set("Asia/Shanghai");
 
 $payChannel = 'WXPAY';//手机版默认微信支付!
 
+if( !isset($_POST['openid'] ) ){
+    die("未传入openid!");
+}
+
+$openid = $_POST['openid'];
 $fhId = $_POST['fh_id'];
 $fhName = $_POST['fh_name'];
 $sxItem = $_POST['sx_item_name'];
@@ -31,6 +36,32 @@ $memberArr = array();
 
 if ($members != "") {
     $memberArr = explode('; ', $members);
+}
+
+
+//生成订单信息
+$notifyUrl = "http://" . $_SERVER['HTTP_HOST'] . "/fhbm/pay/wxpay/notify.php";
+$tools = new JsApiPay();
+$input = new WxPayUnifiedOrder();
+$input->SetProduct_id($sxItem);
+$input->SetGoods_tag($fhName);
+$input->SetBody("准提心脉法会随喜");
+$input->SetAttach("准提心脉法会随喜");
+$input->SetTotal_fee($money*100);
+$input->SetOut_trade_no($order_no);
+$input->SetTime_start(date("YmdHis"));
+$input->SetTime_expire(date("YmdHis", time() + 600));
+$input->SetNotify_url($notifyUrl);
+$input->SetTrade_type("JSAPI");
+$input->SetOpenid($openid);
+$order = WxPayApi::unifiedOrder($input);
+
+if( !isset($order) ){
+    die("订单生成失败!");
+}
+
+if(!array_key_exists("appid", $order) || !array_key_exists("prepay_id", $order) || $order['prepay_id'] == ""){
+    echo "<script>alert('参数错误,点击重新下单!'); window.location.href='m_yishan.php';</script>";
 }
 
 
