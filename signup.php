@@ -53,7 +53,7 @@ $fhName = "文昌帝君供养法会"
 </header>
 <section class="ui-container">
     <div class="ui-form ui-border-t">
-        <form action="#">
+        <form action="#" method="post">
             <div class="ui-form-item ui-border-b">
                 <label>
                     法会名称
@@ -96,12 +96,12 @@ $fhName = "文昌帝君供养法会"
                 <label>
                     手机号码
                 </label>
-                <input type="text" placeholder="请输入手机号码...">
+                <input name="phone" type="text" placeholder="请输入手机号码...">
             </div>
             <ul id="family_member">
 
             </ul>
-
+            <input id="family_member_str" name="members" value=""/>
 
             <div class="ui-form-item ui-form-item-textarea ui-border-b" id="add_member_div">
                 <label>
@@ -116,17 +116,17 @@ $fhName = "文昌帝君供养法会"
                 <label>
                     居住地址
                 </label>
-                <textarea placeholder="请输入居住地址..."></textarea>
+                <textarea name="address" placeholder="请输入居住地址..."></textarea>
             </div>
 
             <div class="ui-form-item ui-form-item-textarea ui-border-b">
                 <label>
                     回向
                 </label>
-                <textarea placeholder="愿一切众生离苦得乐,究竟成佛"></textarea>
+                <textarea name="huixiang" id="huixiang" placeholder="愿一切众生离苦得乐,究竟成佛"></textarea>
             </div>
 
-            <div class="ui-btn-wrap">
+            <div class="ui-btn-wrap" onclick="submitForm()">
                 <button class="ui-btn-lg ui-btn-primary">
                     提交
                 </button>
@@ -212,8 +212,8 @@ $fhName = "文昌帝君供养法会"
 <script src="./js/frozen.js"></script>
 <script>
 
-    memberCount = 1;
-    memberDivCount = 1;
+    memberCount = 0;
+    memberDivCount = 0;
 
     $(document).ready(
         function () {
@@ -271,6 +271,7 @@ $fhName = "文昌帝君供养法会"
         var nameId, birthId;
 
         if (type == "host") {
+
             nameId = type + "_name";
             birthId = type + "_birth";
             $("#user_title").html("斋主姓名");
@@ -314,10 +315,13 @@ $fhName = "文昌帝君供养法会"
             $("#host_birthday").val(birthday);
         } else {
 
-            if (memberCount > 4) {
+            if (memberCount >= 4) {
                 alert("最多只能添加 4 位家庭成员!");
                 return;
             }
+
+            memberCount++;
+            memberDivCount++;
 
             var divId = "member_div_" + memberDivCount;
             var removeId = "member_remove_" + memberDivCount;
@@ -325,7 +329,7 @@ $fhName = "文昌帝君供养法会"
             memberDom.append(
                 "<li class='ui-form-item ui-border-b' id='" + divId + "'>" +
                 "<label>家庭成员</label>" +
-                "<input type='text' value='" + name + " " + birthday + "' disabled>" +
+                "<input type='text' value='" + name + " " + birthday + "' />" +
                 "<a id='" + removeId + "' class='ui-icon-close'></a>" +
                 "</li>"
             );
@@ -333,10 +337,7 @@ $fhName = "文昌帝君供养法会"
                 removeMember(divId);
             });
 
-            memberCount++;
-            memberDivCount++;
-
-            if (memberCount > 4) {
+            if (memberCount == 4) {
                 $("#add_member_div").hide();
             }
         }
@@ -347,10 +348,44 @@ $fhName = "文昌帝君供养法会"
 
     function removeMember(id) {
         $("#" + id).remove();
-        if (memberCount > 4) {
+        if (memberCount >= 4) {
             $("#add_member_div").show();
         }
         memberCount--;
+    }
+
+    function submitForm(){
+
+        //法会编号
+
+        //法会选项
+
+        //随喜金额
+
+        //斋主姓名
+
+        //斋主生日
+
+        //手机号码
+
+        //将家庭成员拼接成一个字符串,放到input隐藏域中
+        var family_members = "";
+        for( var i = 0; i < memberCount; ++i ){
+            family_members = family_members + "" + $("#family_member input").eq(i).val() + "; ";
+        }
+        $("#family_member_str").val(family_members);
+
+        //居住地址
+
+
+        //如果回向没有内容,添加默认值
+        huixiang = $("#huixiang").val();
+        if( huixiang == "" ){
+            huixiang = "愿一切众生离苦得乐,究竟成佛";
+        }
+        $("#huixiang").val(huixiang);
+
+        //
 
     }
 
