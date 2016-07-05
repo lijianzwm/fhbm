@@ -31,6 +31,7 @@
  */
 
 require_once "./conf/db.php";
+require_once "./pay/wxpay/WxPayService.php";
 
 $defaultSelectedYear = 1980;//生日默认选中1980年
 $fhId = 1;//法会id
