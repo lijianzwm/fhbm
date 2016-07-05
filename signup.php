@@ -30,10 +30,24 @@
  *
  */
 
+require_once "./conf/db.php";
+
 $defaultSelectedYear = 1980;//生日默认选中1980年
 $fhId = 1;//法会id
 
-$fhName = "文昌帝君供养法会"
+$sql = "SELECT
+            name
+        FROM
+            fh_fahui
+        WHERE
+            id = '$fhId'";
+
+$result = $db->query($sql);
+if( $result && $row = $result->fetch_array() ){
+    $fhName = $row['name'];
+}else{
+    die("无此法会!");
+}
 
 ?>
 
@@ -43,29 +57,31 @@ $fhName = "文昌帝君供养法会"
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <meta name="format-detection" content="telephone=no">
-    <title>法会报名</title>
+    <title>准提心脉·法会报名</title>
     <link rel="stylesheet" href="./css/frozen.css">
 
 </head>
 <body ontouchstart="">
 <header class="ui-header ui-header-positive ui-border-b">
-    <h1>准提心脉·法会报名</h1>
+    <h1><?php echo $fhName; ?></h1>
 </header>
 <section class="ui-container">
     <div class="ui-form ui-border-t">
-        <form action="#" method="post">
+        <form action="confirm.php" method="post" id="form">
             <div class="ui-form-item ui-border-b">
                 <label>
                     法会名称
                 </label>
                 <input type="text" disabled value="<?php echo $fhName; ?>">
+                <input type="hidden" name="fh_name" value="<?php echo $fhName; ?>">
+                <input type="hidden" name="fh_id" value="<?php echo $fhId; ?>">
             </div>
             <div class="ui-form-item ui-border-b">
                 <label>
                     法会选项
                 </label>
                 <div class="ui-select">
-                    <select id="sx_item" onchange="autoFill()">
+                    <select id="sx_item" name="sx_item" onchange="autoFill()">
                         <option value="300">小斋-300</option>
                         <option value="2000">大斋2000</option>
                         <option value="any">随喜不限</option>
@@ -96,7 +112,7 @@ $fhName = "文昌帝君供养法会"
                 <label>
                     手机号码
                 </label>
-                <input name="phone" type="text" placeholder="请输入手机号码...">
+                <input name="phone" id="phone" type="text" placeholder="请输入手机号码...">
             </div>
             <ul id="family_member">
 
@@ -116,7 +132,7 @@ $fhName = "文昌帝君供养法会"
                 <label>
                     居住地址
                 </label>
-                <textarea name="address" placeholder="请输入居住地址..."></textarea>
+                <textarea name="address" id="address" placeholder="请输入居住地址..."></textarea>
             </div>
 
             <div class="ui-form-item ui-form-item-textarea ui-border-b">
@@ -125,13 +141,12 @@ $fhName = "文昌帝君供养法会"
                 </label>
                 <textarea name="huixiang" id="huixiang" placeholder="愿一切众生离苦得乐,究竟成佛"></textarea>
             </div>
-
-            <div class="ui-btn-wrap" onclick="submitForm()">
-                <button class="ui-btn-lg ui-btn-primary">
-                    提交
-                </button>
-            </div>
         </form>
+        <div class="ui-btn-wrap" onclick="submitForm()">
+            <button class="ui-btn-lg ui-btn-primary">
+                提交
+            </button>
+        </div>
     </div>
 
     <div class="ui-dialog" id="user_info">
@@ -354,39 +369,80 @@ $fhName = "文昌帝君供养法会"
         memberCount--;
     }
 
-    function submitForm(){
-
-        //法会编号
-
-        //法会选项
+    function submitForm() {
 
         //随喜金额
+        var money = $("#money").val();
+        if ( money == "") {
+            alert("请填写随喜金额!");
+            return;
+        }else{
+            if( !money.match(/^[0-9]*$/) ){
+                alert("金额必须为数字!");
+                return;
+            }
+        }
 
         //斋主姓名
+        if ($("#host_name").val() == "") {
+            alert("请填写斋主姓名!");
+            return;
+        }
 
         //斋主生日
+        if ($("#host_birthday").val() == "") {
+            alert("请填写斋主生日!");
+            return;
+        }
 
         //手机号码
+        var phone = $("#phone").val();
+        if ( phone == "") {
+            alert("请填写手机号码!");
+            return;
+        }else{
+            if( !phone.match(/^[1][0-9]{10}$/) ){
+                alert("手机号码格式错误!");
+                return;
+            }
+        }
 
         //将家庭成员拼接成一个字符串,放到input隐藏域中
         var family_members = "";
-        for( var i = 0; i < memberCount; ++i ){
-            family_members = family_members + "" + $("#family_member input").eq(i).val() + "; ";
+        for (var i = 0; i < memberCount; ++i) {
+            if( i > 0 ){
+                family_members = family_members + "; ";
+            }
+            family_members = family_members + $("#family_member input").eq(i).val();
         }
         $("#family_member_str").val(family_members);
 
-        //居住地址
+        //居住地址,,限制居住地址长度
+        var address = $("#address").val();
+        if ( address== "") {
+            alert("请填写居住地址!");
+            return;
+        }else{
+            if( address.length > 300 ){
+                alert("居住地址过长!");
+                return;
+            }
+        }
 
-
-        //如果回向没有内容,添加默认值
-        huixiang = $("#huixiang").val();
-        if( huixiang == "" ){
+        //如果回向没有内容,添加默认值,限制回向长度
+        var huixiang = $("#huixiang").val();
+        if (huixiang == "") {
             huixiang = "愿一切众生离苦得乐,究竟成佛";
+        }else{
+            if( huixiang.length > 300 ){
+                alert("回向内容过长!");
+                return;
+            }
         }
         $("#huixiang").val(huixiang);
 
-        //
-
+        //提交表单
+        $("#form").submit();
     }
 
 
