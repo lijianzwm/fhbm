@@ -49,6 +49,34 @@ if( $result && $row = $result->fetch_array() ){
     die("无此法会!");
 }
 
+//授权,并获取openid
+$code = $_GET["code"];
+if( !$code ){
+    $baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].$_SERVER['QUERY_STRING']);
+    $urlObj["appid"] = WxPayConfig::APPID;
+    $urlObj["redirect_uri"] = "$baseUrl";
+    $urlObj["response_type"] = "code";
+    $urlObj["scope"] = "snsapi_userinfo";
+    $urlObj["state"] = "STATE"."#wechat_redirect";
+    $bizString = "";
+    foreach ($urlObj as $k => $v){
+        if($k != "sign"){
+            $bizString .= $k . "=" . $v . "&";
+        }
+    }
+    $bizString = trim($bizString, "&");
+    $url = "https://open.weixin.qq.com/connect/oauth2/authorize?".$bizString;
+    Header("Location: $url");
+    exit();
+}
+$userinfo = getUserInfo($code);
+if( isset($userinfo['errcode'])){
+    die("授权失败!");
+}
+$openid = $userinfo['openid'];
+
+
+
 ?>
 
 <!DOCTYPE html>
@@ -75,6 +103,7 @@ if( $result && $row = $result->fetch_array() ){
                 <input type="text" disabled value="<?php echo $fhName; ?>">
                 <input type="hidden" name="fh_name" value="<?php echo $fhName; ?>">
                 <input type="hidden" name="fh_id" value="<?php echo $fhId; ?>">
+                <input type="hidden" name="openid" value="<?php echo $openid; ?>">
             </div>
             <div class="ui-form-item ui-border-b">
                 <label>
