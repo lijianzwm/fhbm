@@ -5,3 +5,5 @@
 /pay/wxpay/cert
 
 /pay/wxpay/WxPay.Config.php
+
+/conf/db.php
