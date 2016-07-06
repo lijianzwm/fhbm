@@ -138,7 +138,7 @@ $jsApiParameters = $tools->GetJsApiParameters($order);
     </div>
 
 
-    <!-- 创建订单载入画面 -->
+    <!-- 载入画面 -->
     <div class="ui-loading-block" id="now_loading">
         <div class="ui-loading-cnt">
             <i class="ui-loading-bright"></i>
@@ -171,7 +171,7 @@ $jsApiParameters = $tools->GetJsApiParameters($order);
 <script>
 
     function refill(){
-        window.location.href="signup.php";
+        window.location.href="m_signup.php";
     }
 
     function createOrder(){
@@ -234,7 +234,7 @@ $jsApiParameters = $tools->GetJsApiParameters($order);
                 }else{
                     $("#now_loading").removeClass("show");
                     alert(data.msg);
-                    window.location.href="success.php";
+                    window.location.href="query.php?phone="+<?php echo $phone; ?> + "&fh_id="+<?php echo $fhId; ?>";
                 }
             },
             error: function () {

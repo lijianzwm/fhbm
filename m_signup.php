@@ -9,49 +9,36 @@
 require_once "./conf/db.php";
 require_once "./pay/wxpay/WxPayService.php";
 
+$fhId = $_REQUEST['fh_id'];
+$fhName = $_REQUEST['fh_name'];
+
 $defaultSelectedYear = 1980;//生日默认选中1980年
-$fhId = 1;//法会id
-
-$sql = "SELECT
-            name
-        FROM
-            fh_fahui
-        WHERE
-            id = '$fhId'";
-
-$result = $db->query($sql);
-if( $result && $row = $result->fetch_array() ){
-    $fhName = $row['name'];
-}else{
-    die("无此法会!");
-}
 
 //授权,并获取openid
 $code = $_GET["code"];
-if( !$code ){
-    $baseUrl = urlencode('http://'.$_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF'].$_SERVER['QUERY_STRING']);
+if (!$code) {
+    $baseUrl = urlencode('http://' . $_SERVER['HTTP_HOST'] . $_SERVER['PHP_SELF'] . $_SERVER['QUERY_STRING']);
     $urlObj["appid"] = WxPayConfig::APPID;
     $urlObj["redirect_uri"] = "$baseUrl";
     $urlObj["response_type"] = "code";
     $urlObj["scope"] = "snsapi_userinfo";
-    $urlObj["state"] = "STATE"."#wechat_redirect";
+    $urlObj["state"] = "STATE" . "#wechat_redirect";
     $bizString = "";
-    foreach ($urlObj as $k => $v){
-        if($k != "sign"){
+    foreach ($urlObj as $k => $v) {
+        if ($k != "sign") {
             $bizString .= $k . "=" . $v . "&";
         }
     }
     $bizString = trim($bizString, "&");
-    $url = "https://open.weixin.qq.com/connect/oauth2/authorize?".$bizString;
+    $url = "https://open.weixin.qq.com/connect/oauth2/authorize?" . $bizString;
     Header("Location: $url");
     exit();
 }
 $userinfo = getUserInfo($code);
-if( isset($userinfo['errcode'])){
+if (isset($userinfo['errcode'])) {
     die("授权失败!");
 }
 $openid = $userinfo['openid'];
-
 
 
 ?>
@@ -72,7 +59,7 @@ $openid = $userinfo['openid'];
 </header>
 <section class="ui-container">
     <div class="ui-form ui-border-t">
-        <form action="confirm.php" method="post" id="form">
+        <form action="m_confirm.php" method="post" id="form">
             <div class="ui-form-item ui-border-b">
                 <label>
                     法会名称
@@ -99,7 +86,7 @@ $openid = $userinfo['openid'];
                 <label>
                     随喜金额
                 </label>
-                <input type="text" name="money" id="money" placeholder="请输入随喜金额..." />
+                <input type="text" name="money" id="money" placeholder="请输入随喜金额..."/>
             </div>
             <div class="ui-form-item ui-border-b">
                 <label>
@@ -112,7 +99,7 @@ $openid = $userinfo['openid'];
                 <label>
                     斋主生日
                 </label>
-                <input type="text" name="host_birthday" id="host_birthday"/>
+                <input type="text" name="host_birthday" id="host_birthday" onfocus="fillUserInfo('host')"/>
             </div>
             <div class="ui-form-item ui-border-b">
                 <label>
@@ -278,7 +265,7 @@ $openid = $userinfo['openid'];
         if (money == "any") {
             $("#money_div").show();
             $("#money").val("");
-        }else{
+        } else {
             $("#money_div").hide();
         }
     }
@@ -377,11 +364,11 @@ $openid = $userinfo['openid'];
         $("#money").removeAttr("disabled");
         //随喜金额
         var money = $("#money").val();
-        if ( money == "") {
+        if (money == "") {
             alert("请填写随喜金额!");
             return;
-        }else{
-            if( !money.match(/^[0-9]*$/) ){
+        } else {
+            if (!money.match(/^[0-9]*$/)) {
                 alert("金额必须为数字!");
                 return;
             }
@@ -401,11 +388,11 @@ $openid = $userinfo['openid'];
 
         //手机号码
         var phone = $("#phone").val();
-        if ( phone == "") {
+        if (phone == "") {
             alert("请填写手机号码!");
             return;
-        }else{
-            if( !phone.match(/^[1][0-9]{10}$/) ){
+        } else {
+            if (!phone.match(/^[1][0-9]{10}$/)) {
                 alert("手机号码格式错误!");
                 return;
             }
@@ -414,7 +401,7 @@ $openid = $userinfo['openid'];
         //将家庭成员拼接成一个字符串,放到input隐藏域中
         var family_members = "";
         for (var i = 0; i < memberCount; ++i) {
-            if( i > 0 ){
+            if (i > 0) {
                 family_members = family_members + "; ";
             }
             family_members = family_members + $("#family_member input").eq(i).val();
@@ -423,11 +410,11 @@ $openid = $userinfo['openid'];
 
         //居住地址,,限制居住地址长度
         var address = $("#address").val();
-        if ( address== "") {
+        if (address == "") {
             alert("请填写居住地址!");
             return;
-        }else{
-            if( address.length > 300 ){
+        } else {
+            if (address.length > 300) {
                 alert("居住地址过长!");
                 return;
             }
@@ -437,8 +424,8 @@ $openid = $userinfo['openid'];
         var huixiang = $("#huixiang").val();
         if (huixiang == "") {
             huixiang = "愿一切众生离苦得乐,究竟成佛";
-        }else{
-            if( huixiang.length > 300 ){
+        } else {
+            if (huixiang.length > 300) {
                 alert("回向内容过长!");
                 return;
             }
