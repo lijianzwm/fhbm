@@ -83,31 +83,6 @@ if( !$fhResult ){
         $("#tips").hide();
     }
 
-    function query() {
-        $("#now_loading").addClass("show");
-        var phone = $("#phone").val();
-        $.ajax({
-            url: "QueryAction.php",
-            data: {
-                phone : phone
-            },
-            type: 'post',
-            cache: false,
-            dataType: 'json',
-            success: function (data) {
-                $("#now_loading").removeClass("show");
-                if( data.error_code ){
-                    alert(data.msg);
-                }else{
-
-                }
-            },
-            error: function () {
-                alert("创建订单请求失败!");
-            }
-        });
-    }
-
 </script>
 </body>
 </html>
